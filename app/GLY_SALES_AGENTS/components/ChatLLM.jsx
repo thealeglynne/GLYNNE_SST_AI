@@ -115,29 +115,67 @@ const VoiceChatFlame = () => {
     setActivo(true)
     setIconVisible(false)
     shouldContinueRef.current = true
-
+  
+    // 🔹 Capturar audio del micrófono y enviarlo al backend
+    const grabarAudio = () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+          const mediaRecorder = new MediaRecorder(stream)
+          const chunks = []
+  
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) chunks.push(event.data)
+          }
+  
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(chunks, { type: 'audio/webm' })
+            resolve(audioBlob)
+          }
+  
+          mediaRecorder.start()
+          setTimeout(() => {
+            mediaRecorder.stop()
+            stream.getTracks().forEach(track => track.stop())
+          }, 3000) // graba 3 segundos
+        } catch (err) {
+          reject(err)
+        }
+      })
+    }
+  
     while (shouldContinueRef.current) {
       setConversando(true)
-
+  
       try {
-        const res = await fetch('http://localhost:8000/conversar', { method: 'POST' })
+        // 1️⃣ Capturar audio del usuario
+        const audioBlob = await grabarAudio()
+        const audioBase64 = await blobToBase64(audioBlob)
+  
+        // 2️⃣ Enviar audio al backend
+        const res = await fetch('http://localhost:8000/conversar', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ audio_base64: audioBase64 })
+        })
         const data = await res.json()
-
+  
         if (!res.ok || !data.audio_base64) throw new Error(data.error || 'Error desconocido.')
-
+  
         if (data.transcripcion_usuario?.toLowerCase().includes('salir')) {
           shouldContinueRef.current = false
           break
         }
-
-        const audioBlob = new Blob(
+  
+        // 3️⃣ Reproducir respuesta
+        const respuestaBlob = new Blob(
           [Uint8Array.from(atob(data.audio_base64), c => c.charCodeAt(0))],
           { type: 'audio/mp3' }
         )
-
-        const url = URL.createObjectURL(audioBlob)
+        const url = URL.createObjectURL(respuestaBlob)
         await reproducirAudio(url)
         URL.revokeObjectURL(url)
+  
       } catch (err) {
         console.error('Error al conversar:', err.message)
         shouldContinueRef.current = false
@@ -146,10 +184,21 @@ const VoiceChatFlame = () => {
         setConversando(false)
       }
     }
-
+  
     setActivo(false)
     setIconVisible(true)
   }
+  
+  // 🔹 Función auxiliar para convertir Blob a Base64
+  const blobToBase64 = (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(reader.result.split(',')[1])
+      reader.onerror = reject
+      reader.readAsDataURL(blob)
+    })
+  }
+  
 
   const reproducirAudio = (url) => {
     return new Promise((resolve) => {
