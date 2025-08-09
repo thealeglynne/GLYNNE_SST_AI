@@ -4,6 +4,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import MenuLateral from '../components/menuLateral'
 import Aalert from '../components/alertSalirChaarla'
 
+// Importamos la librería para un reconocimiento de voz más robusto
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+
 const VoiceChatFlame = () => {
   const canvasRef = useRef(null)
   const frequencyData = useRef(new Uint8Array(32))
@@ -15,6 +18,14 @@ const VoiceChatFlame = () => {
   const [activo, setActivo] = useState(false)
   const [iconVisible, setIconVisible] = useState(true)
   const [menuAbierto, setMenuAbierto] = useState(false)
+
+  // Usamos el hook de la librería para gestionar el reconocimiento
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition()
 
   // useEffect para la animación del canvas
   useEffect(() => {
@@ -89,110 +100,77 @@ const VoiceChatFlame = () => {
     })
   }
 
-  const iniciarConversacion = async () => {
-    if (activo) return;
-    setActivo(true);
-    setIconVisible(false);
-    shouldContinueRef.current = true;
+  // Lógica principal de la conversación movida a un useEffect
+  useEffect(() => {
+    const handleConversation = async () => {
+      if (!listening && transcript) {
+        console.log('Texto capturado:', transcript)
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Tu navegador no soporta el reconocimiento de voz. Por favor, usa Google Chrome en escritorio.');
-      setActivo(false);
-      setIconVisible(true);
-      return;
-    }
-
-    const reconocimiento = new SpeechRecognition();
-    reconocimiento.lang = 'es-CO';
-    reconocimiento.interimResults = false;
-    reconocimiento.maxAlternatives = 1;
-
-    // Manejo de errores específicos para el reconocimiento de voz
-    reconocimiento.onerror = (event) => {
-      console.error('Error en reconocimiento:', event.error);
-      let errorMessage = 'Hubo un problema en la conversación. Intenta de nuevo.';
-      if (event.error === 'not-allowed') {
-        errorMessage = 'Acceso al micrófono denegado. Por favor, permite el acceso para usar el asistente.';
-      } else if (event.error === 'network') {
-        errorMessage = 'Problema de red. Revisa tu conexión a internet.';
-      } else if (event.error === 'no-speech') {
-        errorMessage = 'No detecté tu voz. Intenta hablar más claro o revisa tu micrófono.';
-      }
-      alert(errorMessage);
-      reconocimiento.stop();
-      shouldContinueRef.current = false;
-    };
-
-    while (shouldContinueRef.current) {
-      setConversando(true);
-
-      try {
-        const textoUsuario = await new Promise((resolve, reject) => {
-          reconocimiento.start();
-          console.log('Iniciando reconocimiento de voz...');
-          // Detener el reconocimiento después de 5 segundos para evitar que siga escuchando
-          const timeoutId = setTimeout(() => {
-            reconocimiento.stop();
-            console.log('Reconocimiento detenido por timeout');
-          }, 5000);
-
-          reconocimiento.onresult = (event) => {
-            const texto = event.results[0][0].transcript.trim();
-            console.log('Texto capturado:', texto);
-            clearTimeout(timeoutId); // Limpiar el timeout si se obtiene un resultado
-            reconocimiento.stop();
-            resolve(texto);
-          };
-
-          reconocimiento.onend = () => {
-            console.log('Reconocimiento finalizado');
-            clearTimeout(timeoutId);
-            resolve('');
-          };
-        });
-
-        if (!textoUsuario || !textoUsuario.trim()) {
-          console.warn('Texto vacío, omitiendo solicitud.');
-          continue;
+        if (!transcript.trim()) {
+          console.warn('Texto vacío, omitiendo solicitud.')
+          resetTranscript()
+          return
         }
 
-        console.log('Enviando texto al servidor:', textoUsuario);
-        const res = await fetch('https://gly-tts-back.onrender.com/conversar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ texto: textoUsuario }),
-        });
+        console.log('Enviando texto al servidor:', transcript)
+        try {
+          const res = await fetch('https://gly-tts-back.onrender.com/conversar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ texto: transcript }),
+          })
 
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}));
-          throw new Error(errorData.error || `Error HTTP: ${res.status}`);
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}))
+            throw new Error(errorData.error || `Error HTTP: ${res.status}`)
+          }
+
+          const data = await res.json()
+          if (!data.audio_base64) {
+            throw new Error(data.error || 'No se recibió audio válido.')
+          }
+
+          if (transcript.toLowerCase().includes('salir')) {
+            SpeechRecognition.stopListening()
+            setActivo(false)
+            setIconVisible(true)
+            resetTranscript()
+            return
+          }
+
+          await reproducirAudio(data.audio_base64)
+          resetTranscript() // Limpiamos el texto para la siguiente conversación
+          SpeechRecognition.startListening({ continuous: false, language: 'es-CO' })
+        } catch (err) {
+          console.error('Error durante la conversación:', err.message)
+          alert('Hubo un problema con la API. Intenta de nuevo.')
+          SpeechRecognition.stopListening()
+          setActivo(false)
+          setIconVisible(true)
+        } finally {
+          setConversando(false)
         }
-
-        const data = await res.json();
-        if (!data.audio_base64) {
-          throw new Error(data.error || 'No se recibió audio válido.');
-        }
-
-        if (textoUsuario.toLowerCase().includes('salir')) {
-          shouldContinueRef.current = false;
-          break;
-        }
-
-        await reproducirAudio(data.audio_base64);
-      } catch (err) {
-        console.error('Error durante la conversación:', err.message);
-        alert('Hubo un problema con la API. Intenta de nuevo.');
-        shouldContinueRef.current = false;
-        break;
-      } finally {
-        setConversando(false);
       }
     }
 
-    setActivo(false);
-    setIconVisible(true);
-  };
+    if (activo && !listening) {
+      handleConversation()
+    }
+  }, [transcript, listening, activo, resetTranscript])
+
+  const iniciarConversacion = () => {
+    if (activo) return
+
+    if (!browserSupportsSpeechRecognition) {
+      alert('Tu navegador no soporta el reconocimiento de voz. Te recomendamos usar Chrome en escritorio.')
+      return
+    }
+
+    setActivo(true)
+    setConversando(true)
+    setIconVisible(false)
+    SpeechRecognition.startListening({ continuous: false, language: 'es-CO' })
+  }
 
   return (
     <div
