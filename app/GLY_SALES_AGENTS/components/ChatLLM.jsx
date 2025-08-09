@@ -97,7 +97,7 @@ const VoiceChatFlame = () => {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Su navegador no soporta reconocimiento de voz.');
+      alert('Tu navegador no soporta el reconocimiento de voz. Por favor, usa Google Chrome en escritorio.');
       setActivo(false);
       setIconVisible(true);
       return;
@@ -107,6 +107,22 @@ const VoiceChatFlame = () => {
     reconocimiento.lang = 'es-CO';
     reconocimiento.interimResults = false;
     reconocimiento.maxAlternatives = 1;
+
+    // Manejo de errores específicos para el reconocimiento de voz
+    reconocimiento.onerror = (event) => {
+      console.error('Error en reconocimiento:', event.error);
+      let errorMessage = 'Hubo un problema en la conversación. Intenta de nuevo.';
+      if (event.error === 'not-allowed') {
+        errorMessage = 'Acceso al micrófono denegado. Por favor, permite el acceso para usar el asistente.';
+      } else if (event.error === 'network') {
+        errorMessage = 'Problema de red. Revisa tu conexión a internet.';
+      } else if (event.error === 'no-speech') {
+        errorMessage = 'No detecté tu voz. Intenta hablar más claro o revisa tu micrófono.';
+      }
+      alert(errorMessage);
+      reconocimiento.stop();
+      shouldContinueRef.current = false;
+    };
 
     while (shouldContinueRef.current) {
       setConversando(true);
@@ -127,13 +143,6 @@ const VoiceChatFlame = () => {
             clearTimeout(timeoutId); // Limpiar el timeout si se obtiene un resultado
             reconocimiento.stop();
             resolve(texto);
-          };
-
-          reconocimiento.onerror = (event) => {
-            clearTimeout(timeoutId);
-            reconocimiento.stop();
-            console.error('Error en reconocimiento:', event.error);
-            reject(new Error(event.error));
           };
 
           reconocimiento.onend = () => {
@@ -173,7 +182,7 @@ const VoiceChatFlame = () => {
         await reproducirAudio(data.audio_base64);
       } catch (err) {
         console.error('Error durante la conversación:', err.message);
-        alert('Hubo un problema en la conversación. Intenta de nuevo.');
+        alert('Hubo un problema con la API. Intenta de nuevo.');
         shouldContinueRef.current = false;
         break;
       } finally {
