@@ -32,7 +32,7 @@ const VoiceChatFlame = () => {
           window.history.pushState(null, '', window.location.href)
         } else {
           shouldContinueRef.current = false
-          fetch('http://localhost:8000/desactivar', { method: 'POST' }).catch(() => {})
+          fetch('https://gly-tts-back.onrender.com/desactivar', { method: 'POST' }).catch(() => {})
         }
       }
     }
@@ -46,7 +46,7 @@ const VoiceChatFlame = () => {
       window.removeEventListener('popstate', handlePopState)
       if (activo) {
         shouldContinueRef.current = false
-        fetch('http://localhost:8000/desactivar', { method: 'POST' }).catch(() => {})
+        fetch('https://gly-tts-back.onrender.com/desactivar', { method: 'POST' }).catch(() => {})
       }
     }
   }, [activo])
@@ -179,7 +179,7 @@ const VoiceChatFlame = () => {
         }
   
         console.log('Enviando texto al servidor:', textoUsuario);
-        const res = await fetch('http://localhost:8000/conversar', {
+        const res = await fetch('https://gly-tts-back.onrender.com/conversar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ texto: textoUsuario }),
