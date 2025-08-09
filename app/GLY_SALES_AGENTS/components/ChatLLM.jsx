@@ -16,41 +16,7 @@ const VoiceChatFlame = () => {
   const [iconVisible, setIconVisible] = useState(true)
   const [menuAbierto, setMenuAbierto] = useState(false)
 
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (activo) {
-        e.preventDefault()
-        e.returnValue = 'Hay un proceso en ejecución. ¿Seguro que quieres salir?'
-        return e.returnValue
-      }
-    }
-
-    const handlePopState = () => {
-      if (activo) {
-        const confirmar = confirm('Hay un proceso en ejecución. ¿Seguro que quieres salir?')
-        if (!confirmar) {
-          window.history.pushState(null, '', window.location.href)
-        } else {
-          shouldContinueRef.current = false
-          fetch('https://gly-tts-back.onrender.com/desactivar', { method: 'POST' }).catch(() => {})
-        }
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    window.addEventListener('popstate', handlePopState)
-    window.history.pushState(null, '', window.location.href)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      window.removeEventListener('popstate', handlePopState)
-      if (activo) {
-        shouldContinueRef.current = false
-        fetch('https://gly-tts-back.onrender.com/desactivar', { method: 'POST' }).catch(() => {})
-      }
-    }
-  }, [activo])
-
+  // useEffect para la animación del canvas
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
@@ -128,7 +94,7 @@ const VoiceChatFlame = () => {
     setActivo(true);
     setIconVisible(false);
     shouldContinueRef.current = true;
-  
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert('Su navegador no soporta reconocimiento de voz.');
@@ -136,70 +102,74 @@ const VoiceChatFlame = () => {
       setIconVisible(true);
       return;
     }
-  
+
     const reconocimiento = new SpeechRecognition();
     reconocimiento.lang = 'es-CO';
     reconocimiento.interimResults = false;
     reconocimiento.maxAlternatives = 1;
-  
+
     while (shouldContinueRef.current) {
       setConversando(true);
-  
+
       try {
         const textoUsuario = await new Promise((resolve, reject) => {
           reconocimiento.start();
           console.log('Iniciando reconocimiento de voz...');
-          setTimeout(() => {
+          // Detener el reconocimiento después de 5 segundos para evitar que siga escuchando
+          const timeoutId = setTimeout(() => {
             reconocimiento.stop();
             console.log('Reconocimiento detenido por timeout');
           }, 5000);
-  
+
           reconocimiento.onresult = (event) => {
             const texto = event.results[0][0].transcript.trim();
             console.log('Texto capturado:', texto);
+            clearTimeout(timeoutId); // Limpiar el timeout si se obtiene un resultado
             reconocimiento.stop();
             resolve(texto);
           };
-  
+
           reconocimiento.onerror = (event) => {
+            clearTimeout(timeoutId);
             reconocimiento.stop();
             console.error('Error en reconocimiento:', event.error);
             reject(new Error(event.error));
           };
-  
+
           reconocimiento.onend = () => {
             console.log('Reconocimiento finalizado');
+            clearTimeout(timeoutId);
             resolve('');
           };
         });
-  
+
         if (!textoUsuario || !textoUsuario.trim()) {
           console.warn('Texto vacío, omitiendo solicitud.');
           continue;
         }
-  
+
         console.log('Enviando texto al servidor:', textoUsuario);
         const res = await fetch('https://gly-tts-back.onrender.com/conversar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ texto: textoUsuario }),
         });
-  
+
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
           throw new Error(errorData.error || `Error HTTP: ${res.status}`);
         }
-  
+
         const data = await res.json();
         if (!data.audio_base64) {
           throw new Error(data.error || 'No se recibió audio válido.');
         }
-  
+
         if (textoUsuario.toLowerCase().includes('salir')) {
           shouldContinueRef.current = false;
           break;
         }
-  
+
         await reproducirAudio(data.audio_base64);
       } catch (err) {
         console.error('Error durante la conversación:', err.message);
@@ -210,7 +180,7 @@ const VoiceChatFlame = () => {
         setConversando(false);
       }
     }
-  
+
     setActivo(false);
     setIconVisible(true);
   };
