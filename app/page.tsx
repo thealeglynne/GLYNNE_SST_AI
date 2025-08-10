@@ -6,7 +6,7 @@ import Head from 'next/head';
 
 import Header from './components/header'
 import Main1 from './components/main1';
-
+import Alert from './GLY_SALES_AGENTS/components/bloqeNoCrome'; // <<<<<<< Aquí se importa el nuevo componente
 
 function AnimatedSection({
   children,
@@ -52,6 +52,7 @@ export default function Home() {
   return (
     <>
       <Head>
+        {/* ... (Todo tu código de Head) ... */}
         <title>GLYNNE – Automatización Empresarial con IA y Arquitectura Escalable</title>
         <meta name="description" content="GLYNNE es una plataforma empresarial que permite integrar inteligencia artificial y automatización avanzada en cada proceso operativo. Diagnósticos inteligentes, orquestación con agentes IA, dashboards en tiempo real y más." />
         <meta name="keywords" content="GLYNNE, automatización empresarial, inteligencia artificial, RPA, BPA, integración, agentes IA, LangChain, Next.js, arquitectura escalable, orquestación, low-code, no-code, procesos empresariales, eficiencia operativa, Supabase, n8n" />
@@ -79,23 +80,17 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
- 
-        <div
-          className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-white text-black no-scrollbar"
-          style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch' }}
-        >
+      <Alert /> {/* <<<<<<< Aquí se renderiza el componente de alerta */}
 
-            <Header />
- 
-
-\
-          <AnimatedSection>
-            <Main1 />
-          </AnimatedSection>
-
-          
-        </div>
-    
+      <div
+        className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-white text-black no-scrollbar"
+        style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch' }}
+      >
+        <Header />
+        <AnimatedSection>
+          <Main1 />
+        </AnimatedSection>
+      </div>
     </>
   );
 }
