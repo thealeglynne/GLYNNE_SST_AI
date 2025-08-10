@@ -3,31 +3,23 @@
 import React, { useEffect, useRef, useState } from 'react'
 import MenuLateral from '../components/menuLateral'
 import Aalert from '../components/alertSalirChaarla'
-
-// Importamos la librería para un reconocimiento de voz más robusto
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 const VoiceChatFlame = () => {
   const canvasRef = useRef(null)
-  const frequencyData = useRef(new Uint8Array(32))
+  const frequencyData = useRef(null)
   const analyserRef = useRef(null)
   const animationIdRef = useRef(null)
-  const shouldContinueRef = useRef(true)
+  const audioCtxRef = useRef(null)
 
   const [conversando, setConversando] = useState(false)
   const [activo, setActivo] = useState(false)
   const [iconVisible, setIconVisible] = useState(true)
   const [menuAbierto, setMenuAbierto] = useState(false)
 
-  // Usamos el hook de la librería para gestionar el reconocimiento
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition
-  } = useSpeechRecognition()
+  const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition()
 
-  // useEffect para la animación del canvas
+  // 🎨 Animación del canvas
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
@@ -41,12 +33,16 @@ const VoiceChatFlame = () => {
     resizeCanvas()
 
     const draw = () => {
+      if (analyserRef.current && frequencyData.current) {
+        analyserRef.current.getByteFrequencyData(frequencyData.current)
+      }
+
       const width = canvas.width
       const height = canvas.height
-      const numBars = 94
+      const numBars = frequencyData.current ? frequencyData.current.length : 0
       const spacing = 4
       const totalSpacing = spacing * (numBars - 1)
-      const barWidth = (width - totalSpacing) / numBars
+      const barWidth = numBars > 0 ? (width - totalSpacing) / numBars : 0
 
       ctx.clearRect(0, 0, width, height)
 
@@ -80,12 +76,25 @@ const VoiceChatFlame = () => {
     }
   }, [])
 
+  // 🔊 Reproducir audio y alimentar el AnalyserNode
   const reproducirAudio = (audioBase64) => {
     return new Promise((resolve) => {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)()
+        analyserRef.current = audioCtxRef.current.createAnalyser()
+        analyserRef.current.fftSize = 128
+        frequencyData.current = new Uint8Array(analyserRef.current.frequencyBinCount)
+      }
+
       const audioBlob = new Blob([Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))], { type: 'audio/mp3' })
       const url = URL.createObjectURL(audioBlob)
       const audio = new Audio(url)
       audio.crossOrigin = 'anonymous'
+
+      // Conectar al AnalyserNode
+      const source = audioCtxRef.current.createMediaElementSource(audio)
+      source.connect(analyserRef.current)
+      analyserRef.current.connect(audioCtxRef.current.destination)
 
       audio.onended = () => {
         URL.revokeObjectURL(url)
@@ -100,19 +109,15 @@ const VoiceChatFlame = () => {
     })
   }
 
-  // Lógica principal de la conversación movida a un useEffect
+  // 🗣 Lógica de conversación
   useEffect(() => {
     const handleConversation = async () => {
       if (!listening && transcript) {
-        console.log('Texto capturado:', transcript)
-
         if (!transcript.trim()) {
-          console.warn('Texto vacío, omitiendo solicitud.')
           resetTranscript()
           return
         }
 
-        console.log('Enviando texto al servidor:', transcript)
         try {
           const res = await fetch('https://gly-tts-back.onrender.com/conversar', {
             method: 'POST',
@@ -120,15 +125,10 @@ const VoiceChatFlame = () => {
             body: JSON.stringify({ texto: transcript }),
           })
 
-          if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}))
-            throw new Error(errorData.error || `Error HTTP: ${res.status}`)
-          }
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
 
           const data = await res.json()
-          if (!data.audio_base64) {
-            throw new Error(data.error || 'No se recibió audio válido.')
-          }
+          if (!data.audio_base64) throw new Error('Audio inválido')
 
           if (transcript.toLowerCase().includes('salir')) {
             SpeechRecognition.stopListening()
@@ -139,11 +139,11 @@ const VoiceChatFlame = () => {
           }
 
           await reproducirAudio(data.audio_base64)
-          resetTranscript() // Limpiamos el texto para la siguiente conversación
+          resetTranscript()
           SpeechRecognition.startListening({ continuous: false, language: 'es-CO' })
         } catch (err) {
-          console.error('Error durante la conversación:', err.message)
-          alert('Hubo un problema con la API. Intenta de nuevo.')
+          console.error('Error:', err)
+          alert('Hubo un problema con la API')
           SpeechRecognition.stopListening()
           setActivo(false)
           setIconVisible(true)
@@ -153,16 +153,13 @@ const VoiceChatFlame = () => {
       }
     }
 
-    if (activo && !listening) {
-      handleConversation()
-    }
+    if (activo && !listening) handleConversation()
   }, [transcript, listening, activo, resetTranscript])
 
   const iniciarConversacion = () => {
     if (activo) return
-
     if (!browserSupportsSpeechRecognition) {
-      alert('Tu navegador no soporta el reconocimiento de voz. Te recomendamos usar Chrome en escritorio.')
+      alert('Tu navegador no soporta reconocimiento de voz.')
       return
     }
 
@@ -178,12 +175,11 @@ const VoiceChatFlame = () => {
         menuAbierto ? 'overflow-auto' : 'overflow-hidden'
       }`}
     >
-      {/* Menú lateral */}
       <div className="mt-[32px]">
         <MenuLateral onToggle={(abierto) => setMenuAbierto(abierto)} />
       </div>
       <Aalert />
-      {/* Zona principal */}
+
       <div
         className="flex flex-col flex-1 items-center justify-center"
         onClick={iniciarConversacion}
@@ -197,9 +193,8 @@ const VoiceChatFlame = () => {
           }}
         >
           <div className="rounded-full overflow-hidden w-[200px] h-[200px] backdrop-blur-md relative">
-            <canvas ref={canvasRef} className="w-200 h-full" />
+            <canvas ref={canvasRef} className="w-100 h-full block" />
 
-            {/* Icono */}
             <div
               className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
                 iconVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'
@@ -218,7 +213,6 @@ const VoiceChatFlame = () => {
         )}
       </div>
 
-      {/* Animación */}
       <style jsx>{`
         @keyframes slide {
           0% {
