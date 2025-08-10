@@ -109,6 +109,22 @@ const VoiceChatFlame = () => {
     })
   }
 
+  // 🆕 Watchdog: desbloquea si el micrófono queda colgado
+  useEffect(() => {
+    if (!activo) return
+
+    const watchdog = setInterval(() => {
+      if (!listening && !conversando && transcript.trim() === '') {
+        console.warn('Reactivando micrófono por inactividad o bloqueo...')
+        setIconVisible(true)
+        setActivo(false)
+        SpeechRecognition.stopListening()
+      }
+    }, 3000)
+
+    return () => clearInterval(watchdog)
+  }, [activo, listening, conversando, transcript])
+
   // 🗣 Lógica de conversación
   useEffect(() => {
     const handleConversation = async () => {
@@ -156,8 +172,17 @@ const VoiceChatFlame = () => {
     if (activo && !listening) handleConversation()
   }, [transcript, listening, activo, resetTranscript])
 
+  // 🔄 Inicio / reinicio de conversación
   const iniciarConversacion = () => {
-    if (activo) return
+    if (activo) {
+      // Reinicio manual si está colgado
+      setActivo(false)
+      setIconVisible(true)
+      SpeechRecognition.stopListening()
+      resetTranscript()
+      return
+    }
+
     if (!browserSupportsSpeechRecognition) {
       alert('Tu navegador no soporta reconocimiento de voz.')
       return
