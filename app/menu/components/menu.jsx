@@ -10,8 +10,8 @@ export default function Sections() {
   const cards = [
     {
         type: 'consulting',
-        title: '¿Quieres resultados reales? Habla con GLY, nuestro asesor que diseña tu futuro.',
-        subtitle: 'Conversa con nuestro analista experto y diseña automatizaciones inteligentes personalizadas para tu empresa.',
+        title: '¿no sabes como integrar ia?',
+        subtitle: 'hablame ',
         link: '/GLY_SALES_AGENTS',
         colSpan: 3,
         height: 350,
@@ -19,10 +19,10 @@ export default function Sections() {
       }
       ,
     {
-      type: 'vision',
-      title: 'Vision for the Future',
-      subtitle: 'Visit us',
-      link: '/vision',
+      type: 'construye tu auditoria',
+      title: 'construye tu auditoria',
+      subtitle: 'escribeme',
+      link: '/chat',
       colSpan: 3,
       height: 350,
       bgImage:
