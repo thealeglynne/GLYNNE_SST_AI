@@ -6,7 +6,7 @@ import Head from 'next/head';
 
 import Header from './components/header'
 import Main1 from './components/main1';
-import Alert from './GLY_SALES_AGENTS/components/bloqeNoCrome'; // <<<<<<< Aquí se importa el nuevo componente
+
 
 function AnimatedSection({
   children,
@@ -80,7 +80,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Alert /> {/* <<<<<<< Aquí se renderiza el componente de alerta */}
+
 
       <div
         className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-white text-black no-scrollbar"

@@ -29,11 +29,11 @@ export default function Diagnostico() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-white">
+    <div className="relative min-h-screen bg-black">
       <Header />
       
       {/* 1. Muestra el loader de cold start solo si showLoader es true */}
-      {showLoader && <ColdStartLoader />}
+      
 
       {/* 2. Muestra el modal de inicio o el chat cuando el loader no está activo */}
       {!showLoader && (

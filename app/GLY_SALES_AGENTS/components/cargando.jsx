@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import Block from '../components/bloqeNoCrome'
 
 const ColdStartLoader = ({ onBackendReady }) => {
   useEffect(() => {
@@ -42,6 +43,7 @@ const ColdStartLoader = ({ onBackendReady }) => {
 
   return (
     <AnimatePresence>
+         <Block />  {/* Aquí se renderiza la alerta */}
       <motion.div
         className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-50 p-4"
         initial={{ opacity: 0 }}

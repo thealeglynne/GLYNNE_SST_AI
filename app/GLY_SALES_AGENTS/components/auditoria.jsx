@@ -48,7 +48,7 @@ export default function BienvenidaUsuario() {
     <div
       className="w-full max-w-xs mx-auto bg-white shadow-md rounded-2xl p-5 text-center border border-gray-100"
       style={{
-        backgroundImage: "url('https://i.pinimg.com/736x/4b/32/4d/4b324ddea8607a530697f5638ad11c9e.jpg')",
+        backgroundImage: "url('https://i.pinimg.com/1200x/41/d4/b4/41d4b43b87971efc50800e692b6a53fc.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
@@ -56,9 +56,7 @@ export default function BienvenidaUsuario() {
       <h2 className="text-lg font-bold text-gray-while">
         Impulsa tu negocio
       </h2>
-      <p className="text-xs text-gray-900 mt-1">
-        Con inteligencia artificial
-      </p>
+  
       <p className="text-[11px] text-gray-400 mt-1 italic">
         {userInfo.nombre}
       </p>
