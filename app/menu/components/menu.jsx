@@ -9,15 +9,15 @@ export default function Sections() {
 
   const cards = [
     {
-      type: 'consulting',
-      title: 'Unlocking Digital Transformation',
-      subtitle: 'Consult us today',
-      link: '/GLY_SALES_AGENTS',
-      colSpan: 3,
-      height: 350,
-      bgImage:
-        'https://i.pinimg.com/736x/d1/39/94/d1399452f20417732ffc5737adf39230.jpg',
-    },
+        type: 'consulting',
+        title: '¿Quieres resultados reales? Habla con GLY, nuestro asesor que diseña tu futuro.',
+        subtitle: 'Conversa con nuestro analista experto y diseña automatizaciones inteligentes personalizadas para tu empresa.',
+        link: '/GLY_SALES_AGENTS',
+        colSpan: 3,
+        height: 350,
+        bgImage: '/av.png',
+      }
+      ,
     {
       type: 'vision',
       title: 'Vision for the Future',
@@ -26,7 +26,7 @@ export default function Sections() {
       colSpan: 3,
       height: 350,
       bgImage:
-        'https://i.pinimg.com/736x/d5/71/4f/d5714f6ba95be8a19531534340ae04d8.jpg',
+        '/ssalaG.png',
     },
     {
       type: 'technology',
@@ -36,7 +36,7 @@ export default function Sections() {
       colSpan: 2,
       height: 300,
       bgImage:
-        'https://i.pinimg.com/736x/5f/ee/01/5fee01eb1ca8460e09a2588c55414514.jpg',
+        '/nena.png',
     },
     {
       type: 'bigdata',
@@ -46,7 +46,7 @@ export default function Sections() {
       colSpan: 2,
       height: 300,
       bgImage:
-        'https://i.pinimg.com/736x/e4/a8/97/e4a89797e3411675f19c6fa36c037513.jpg',
+        '/fort.png',
     },
     {
       type: 'smartlife',
@@ -56,7 +56,7 @@ export default function Sections() {
       colSpan: 2,
       height: 300,
       bgImage:
-        'https://i.pinimg.com/1200x/97/ac/4b/97ac4b43e4bddb6d4df16543ae743fff.jpg',
+        '/des.png',
     },
   ];
 
