@@ -48,7 +48,7 @@ export default function InstruccionesAuditoriaCompact() {
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
-    <div className="w-full max-w-[400px] mx-auto p-4 space-y-4 bg-white rounded-2xl shadow-lg border border-gray-200">
+    <div className="w-full max-w-[400px] mx-auto p-4 space-y-4 bg-white  shadow-lg border border-gray-200">
       <motion.h2
         className="text-lg font-bold text-center text-gray-800"
         initial={{ opacity: 0, y: 20 }}

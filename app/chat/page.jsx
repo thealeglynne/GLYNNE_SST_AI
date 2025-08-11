@@ -9,7 +9,7 @@ export default function Diagnostico() {
   const [datosEmpresa, setDatosEmpresa] = useState(null);
 
   return (
-    <div className="relative min-h-screen bg-gray-100">
+    <div className="relative min-h-100 bg-gray-100">
       <Header />
      {!datosEmpresa && <ModalInicio onComplete={setDatosEmpresa} />} 
       {datosEmpresa && <ChatLLM empresa={datosEmpresa} />}

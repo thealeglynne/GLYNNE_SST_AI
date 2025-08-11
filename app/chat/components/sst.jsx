@@ -41,12 +41,12 @@ export default function BienvenidaUsuario() {
   }
 
   const handleRedirect = () => {
-    window.location.href = 'https://glynne-sst-ai-hsiy.vercel.app/chat';
+    window.location.href = 'https://glynne-sst-ai-hsiy.vercel.app/GLY_SALES_AGENTS';
   };
 
   return (
     <div
-      className="w-full max-w-xs mx-auto bg-white shadow-md rounded-2xl p-5 text-center border border-gray-100"
+      className="w-full max-w-xs mx-auto bg-white shadow-md  mb-[30px] p-5 text-center"
       style={{
         backgroundImage: "url('https://i.pinimg.com/1200x/41/d4/b4/41d4b43b87971efc50800e692b6a53fc.jpg')",
         backgroundSize: 'cover',

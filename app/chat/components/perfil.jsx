@@ -44,7 +44,7 @@ export default function PerfilUsuario() {
   }
 
   return (
-    <div className="w-full max-w-xs mx-auto bg-white shadow-md rounded-2xl p-6 text-center border border-gray-100">
+    <div className="w-full max-w-xs mx-auto bg-white shadow-md p-6 text-center border border-gray-100 mb-[30px]">
       <img
         src={userInfo.avatarUrl}
         alt="Avatar"
