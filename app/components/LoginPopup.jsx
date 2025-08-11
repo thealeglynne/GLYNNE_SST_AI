@@ -42,7 +42,7 @@ export function LoginPopup({ visible, onClose }) {
           await supabase.from('GLNNEacces').insert([{ email: user.email }]);
         }
 
-        router.push('/GLY_SALES_AGENTS');
+        router.push('/menu');
       }
     };
 
