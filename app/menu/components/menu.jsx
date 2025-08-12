@@ -61,7 +61,7 @@ export default function Sections() {
   ];
 
   return (
-    <div className="w-full min-h-screen text-black px-4 py-20 bg-white flex flex-col items-center">
+    <div className="w-full min-h-screen text-black px-4 py-20  flex flex-col items-center">
       <Header />
 
       {/* Título más pequeño */}
