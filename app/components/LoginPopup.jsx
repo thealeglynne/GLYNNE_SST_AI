@@ -73,7 +73,7 @@ export function LoginPopup({ visible, onClose }) {
 
             <h3 className="text-base font-bold text-gray-800 text-center mb-2">Empieza ahora</h3>
             <p className="text-xs text-gray-600 text-center mb-4">
-              Inicia sesión para recibir recomendaciones personalizadas.
+              Inicia sesión para recibir recomendaciones personalizadas .
             </p>
 
             <button
