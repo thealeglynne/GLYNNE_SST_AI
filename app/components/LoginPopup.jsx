@@ -11,12 +11,10 @@ export function LoginPopup({ visible, onClose }) {
   const router = useRouter();
   const [email, setEmail] = useState('');
 
+  // Login con Google SIN redirectTo, dejamos que onAuthStateChange maneje la navegación
   const handleGoogleLogin = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/`,
-      },
     });
 
     if (error) {
@@ -26,27 +24,31 @@ export function LoginPopup({ visible, onClose }) {
   };
 
   useEffect(() => {
-    const checkAndInsertUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+    // Escucha cambios de sesión
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user?.email) {
+        const userEmail = session.user.email;
+        setEmail(userEmail);
 
-      if (user?.email) {
-        setEmail(user.email);
-
+        // Verificar si el usuario ya existe en la tabla
         const { data, error } = await supabase
           .from('GLNNEacces')
           .select('*')
-          .eq('email', user.email)
+          .eq('email', userEmail)
           .single();
 
         if (!data && !error) {
-          await supabase.from('GLNNEacces').insert([{ email: user.email }]);
+          await supabase.from('GLNNEacces').insert([{ email: userEmail }]);
         }
 
-        router.push('/');
+        // Ahora sí redirigimos al menú
+        router.push('/menu');
       }
-    };
+    });
 
-    checkAndInsertUser();
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, [router]);
 
   return (
@@ -73,7 +75,7 @@ export function LoginPopup({ visible, onClose }) {
 
             <h3 className="text-base font-bold text-gray-800 text-center mb-2">Empieza ahora</h3>
             <p className="text-xs text-gray-600 text-center mb-4">
-              Inicia sesión para recibir recomendaciones personalizadas .
+              Inicia sesión para recibir recomendaciones personalizadas.
             </p>
 
             <button
