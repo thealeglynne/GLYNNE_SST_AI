@@ -15,7 +15,7 @@ export function LoginPopup({ visible, onClose }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/menu`,
       },
     });
 
@@ -42,7 +42,7 @@ export function LoginPopup({ visible, onClose }) {
           await supabase.from('GLNNEacces').insert([{ email: user.email }]);
         }
 
-        router.push('/');
+        router.push('/menu');
       }
     };
 
