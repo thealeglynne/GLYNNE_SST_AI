@@ -6,11 +6,40 @@ import { LoginPopup } from './LoginPopup';
 export default function Main1() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogo, setShowLogo] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Animación inicial del logo
   useEffect(() => {
     const timeout = setTimeout(() => setShowLogo(true), 1000);
     return () => clearTimeout(timeout);
   }, []);
+
+  // Función para "despertar" los backends
+  const wakeUpServices = async () => {
+    setLoading(true);
+    try {
+      // URLs de los backends
+      const urls = [
+        'https://gly-ai-brain.onrender.com/',
+        'https://gly-tts-back.onrender.com/'
+      ];
+
+      // Ejecutar las peticiones en paralelo
+      await Promise.all(
+        urls.map(async (url) => {
+          try {
+            const res = await fetch(url, { method: 'GET' });
+            console.log(`Wake-up OK: ${url}`, await res.json());
+          } catch (err) {
+            console.warn(`Error al despertar ${url}`, err);
+          }
+        })
+      );
+    } finally {
+      setLoading(false);
+      setShowLoginModal(true);
+    }
+  };
 
   return (
     <main className="relative w-full h-screen overflow-hidden font-inter">
@@ -55,12 +84,15 @@ export default function Main1() {
           <button
             onClick={() => {
               localStorage.removeItem('glyiaChatClosed');
-              setShowLoginModal(true);
+              wakeUpServices();
             }}
-            className="relative mt-2 px-6 py-3 text-sm font-semibold bg-white text-black rounded-xl shadow-xl group overflow-hidden transition-all"
+            disabled={loading}
+            className="relative mt-2 px-6 py-3 text-sm font-semibold bg-white text-black rounded-xl shadow-xl group overflow-hidden transition-all disabled:opacity-50"
           >
             <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-black/10 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
-            <span className="relative z-10">Hablar con mi Asesor IA</span>
+            <span className="relative z-10">
+              {loading ? 'Conectando...' : 'Hablar con mi Asesor IA'}
+            </span>
           </button>
         </div>
       </div>
