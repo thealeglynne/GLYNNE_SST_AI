@@ -29,7 +29,7 @@ export default function Diagnostico() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-black">
+    <div className="relative min-h-screen ">
       <Header />
       
       {/* 1. Muestra el loader de cold start solo si showLoader es true */}
