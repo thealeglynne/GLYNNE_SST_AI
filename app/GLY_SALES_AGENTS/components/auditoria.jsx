@@ -48,16 +48,16 @@ export default function BienvenidaUsuario() {
     <div
       className="w-full max-w-xs mx-auto bg-white shadow-md rounded-2xl p-5 text-center border border-gray-100"
       style={{
-        backgroundImage: "url('https://i.pinimg.com/1200x/41/d4/b4/41d4b43b87971efc50800e692b6a53fc.jpg')",
+        backgroundImage: "url('https://i.pinimg.com/736x/50/ab/12/50ab1273f48ae11bd7e8c150dfe2ba8c.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
     >
-      <h2 className="text-lg font-bold text-gray-while">
+      <h2 className="text-lg font-bold text-white text-gray-while">
         Impulsa tu negocio
       </h2>
   
-      <p className="text-[11px] text-gray-400 mt-1 italic">
+      <p className="text-[11px] text-white mt-1 italic">
         {userInfo.nombre}
       </p>
 

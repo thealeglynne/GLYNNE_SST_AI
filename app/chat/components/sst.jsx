@@ -40,7 +40,7 @@ export default function BienvenidaUsuario() {
     <div
       className="relative w-full max-w-xs mx-auto shadow-md mb-[30px] p-5 text-center rounded-xl overflow-hidden"
       style={{
-        backgroundImage: "url('https://i.pinimg.com/736x/35/3d/88/353d88a01ce8aca83fc989a112815bfd.jpg')",
+        backgroundImage: "url('https://i.pinimg.com/originals/dd/44/f6/dd44f644c063876949b1d96efd6b7442.gif')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
