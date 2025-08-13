@@ -6,7 +6,7 @@ import ChatLLM from './components/ChatLLM';
 import Header from './components/header';
 import ColdStartLoader from './components/cargando'; // Importa el componente de carga
 
-const COLD_START_TIME = 8000; // 8 segundos de espera para el backend
+const COLD_START_TIME = 200; // 8 segundos de espera para el backend
 const SESSION_KEY = 'glynne_first_visit';
 
 export default function Diagnostico() {
