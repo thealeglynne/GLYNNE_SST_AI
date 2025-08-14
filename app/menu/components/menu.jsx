@@ -32,7 +32,7 @@ export default function Sections() {
       type: 'technology',
       title: 'Digital Technology',
       subtitle: 'Helping global businesses',
-      link: '/technology',
+      link: '/CSVanaliza',
       colSpan: 2,
       height: 300,
       bgImage:
