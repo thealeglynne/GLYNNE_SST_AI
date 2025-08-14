@@ -17,7 +17,8 @@ export default function Page() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ texto: 'ping' })
-          })
+          }),
+          fetch('https://gly-csv-service-3.onrender.com', { method: 'GET' }) // nueva llamada
         ]);
       } catch (error) {
         console.error('Error al despertar los servicios:', error);
@@ -27,11 +28,10 @@ export default function Page() {
     };
 
     wakeUpServers();
-  }, []);
+  }, []); // ✅ solo un cierre aquí
 
   return (
     <div className="min-h-screen bg-white p-0 m-0 relative flex flex-col">
-      {/* Loader con estilo ModalInicio */}
       <AnimatePresence>
         {loading && (
           <motion.div
@@ -79,10 +79,9 @@ export default function Page() {
                 Este paso inicial conecta con nuestros servicios de <strong>inteligencia artificial</strong> 
                 y procesamiento de voz antes de comenzar.
               </p>
-              <br></br>
-              <p>pede tardar un minuto ...</p>
+              <br />
+              <p>Puede tardar un minuto...</p>
 
-              {/* Bolita de carga (ahora en negro) */}
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
@@ -93,7 +92,6 @@ export default function Page() {
         )}
       </AnimatePresence>
 
-      {/* Contenido del menú */}
       <Menu />
     </div>
   );
