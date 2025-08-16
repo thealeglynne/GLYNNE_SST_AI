@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Dashborad from './Graficas'
+import Chart from 'chart.js/auto';
 import { 
   faFileUpload, 
   faRocket, 
@@ -21,6 +21,93 @@ import {
   faDatabase
 } from '@fortawesome/free-solid-svg-icons';
 
+// Dashboard Component for Chart.js
+const Dashboard = ({ data }) => {
+  const chartRef = useRef(null);
+  const chartInstanceRef = useRef(null);
+
+  useEffect(() => {
+    if (data && Array.isArray(data) && data.length > 0 && chartRef.current) {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
+
+      const labels = data.map((row, idx) => `Fila ${idx + 1}`);
+      const keys = Object.keys(data[0]).filter((key) => !isNaN(data[0][key]));
+      const datasets = keys.map((key, index) => ({
+        label: key,
+        data: data.map((row) => Number(row[key])),
+        backgroundColor: `rgba(${75 + index * 50}, ${192 - index * 50}, ${192 - index * 20}, 0.5)`,
+        borderColor: `rgba(${75 + index * 50}, ${192 - index * 50}, ${192 - index * 20}, 1)`,
+        borderWidth: 1,
+      }));
+
+      chartInstanceRef.current = new Chart(chartRef.current, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets,
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: 'Análisis de Datos',
+              font: {
+                size: 16,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    return () => {
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+        chartInstanceRef.current = null;
+      }
+    };
+  }, [data]);
+
+  return (
+    <motion.div
+      className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h2 className="text-lg font-medium mb-4 text-gray-800 flex items-center">
+        <span className="w-4 h-4 mr-2 flex items-center justify-center">
+          <FontAwesomeIcon icon={faChartBar} className="text-gray-500" width="12" height="12" />
+        </span>
+        <span className="text-gray-700">Gráficos de Datos</span>
+      </h2>
+      <div className="overflow-x-auto">
+        {data && Array.isArray(data) && data.length > 0 ? (
+          <div style={{ height: '300px' }}>
+            <canvas ref={chartRef}></canvas>
+          </div>
+        ) : (
+          <div className="text-gray-400 italic">
+            No hay datos disponibles para mostrar gráficos.
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
 export default function AnalizadorDatos() {
   const [descripcion, setDescripcion] = useState('');
   const [file, setFile] = useState(null);
@@ -35,7 +122,6 @@ export default function AnalizadorDatos() {
 
   const formatText = (text) => {
     if (!text) return '';
-    // Convertir *texto* a <strong>texto</strong> y mantener saltos de línea
     return text
       .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
       .replace(/\n/g, '<br />');
@@ -68,6 +154,7 @@ export default function AnalizadorDatos() {
 
       const data = await res.json();
       setResultado(data);
+      setData(data.contenido);
       setActiveSection('informe');
     } catch (err) {
       console.error(err);
@@ -93,22 +180,21 @@ export default function AnalizadorDatos() {
           Resumen General
         </h3>
         <table className="w-full border-collapse mb-6 text-gray-800">
-  <tbody>
-    <tr className="bg-gray-100">
-      <td className="p-2 border border-gray-200 font-medium">Filas</td>
-      <td className="p-2 border border-gray-200">{perfil.shape[0]}</td>
-    </tr>
-    <tr>
-      <td className="p-2 border border-gray-200 font-medium">Columnas</td>
-      <td className="p-2 border border-gray-200">{perfil.shape[1]}</td>
-    </tr>
-    <tr className="bg-gray-100">
-      <td className="p-2 border border-gray-200 font-medium">Registros duplicados</td>
-      <td className="p-2 border border-gray-200">{perfil.duplicates}</td>
-    </tr>
-  </tbody>
-</table>
-
+          <tbody>
+            <tr className="bg-gray-100">
+              <td className="p-2 border border-gray-200 font-medium">Filas</td>
+              <td className="p-2 border border-gray-200">{perfil.shape[0]}</td>
+            </tr>
+            <tr>
+              <td className="p-2 border border-gray-200 font-medium">Columnas</td>
+              <td className="p-2 border border-gray-200">{perfil.shape[1]}</td>
+            </tr>
+            <tr className="bg-gray-100">
+              <td className="p-2 border border-gray-200 font-medium">Registros duplicados</td>
+              <td className="p-2 border border-gray-200">{perfil.duplicates}</td>
+            </tr>
+          </tbody>
+        </table>
 
         <h3 className="text-base font-medium mb-3 text-gray-800 flex items-center">
           <span className="w-4 h-4 mr-2 flex items-center justify-center">
@@ -156,8 +242,6 @@ export default function AnalizadorDatos() {
           </tbody>
         </table>
 
-        
-
         {perfil.categorical_tops && (
           <>
             <h3 className="text-base font-medium mb-3 text-gray-800 flex items-center">
@@ -195,12 +279,9 @@ export default function AnalizadorDatos() {
 
   return (
     <div className="relative w-full h-screen bg-white overflow-hidden">
-      {/* Contenedor principal con scroll horizontal */}
       <div className="h-full flex flex-nowrap overflow-x-auto">
-        {/* Panel izquierdo - Formulario */}
         <div className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 h-full overflow-y-auto p-6">
           <div className="flex flex-col items-center text-center space-y-6">
-            {/* Logo */}
             <motion.img
               src="/logo2.png"
               alt="Logo"
@@ -209,8 +290,6 @@ export default function AnalizadorDatos() {
               transition={{ duration: 0.5 }}
               className="w-16 h-16 mb-2"
             />
-
-            {/* Título */}
             <motion.h2
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -219,8 +298,6 @@ export default function AnalizadorDatos() {
             >
               Analiza más a fondo tus datos y tu negocio con IA
             </motion.h2>
-
-            {/* Texto explicativo */}
             <motion.p
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
@@ -230,22 +307,19 @@ export default function AnalizadorDatos() {
               Sube tus bases de datos y nuestro sistema de inteligencia artificial los procesará 
               para ofrecerte un análisis rápido, preciso y fácil de entender.
             </motion.p>
-
-            {/* Formulario */}
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.6 }}
               className="w-full"
             >
-              <form onSubmit={handleSubmit} className="mb-6 p-6 text-gray-800 bg-white rounded-lg shadow-md border  border-gray-200">
+              <form onSubmit={handleSubmit} className="mb-6 p-6 text-gray-800 bg-white rounded-lg shadow-md border border-gray-200">
                 <textarea
                   placeholder="Descripción de la base de datos..."
                   value={descripcion}
                   onChange={(e) => setDescripcion(e.target.value)}
                   className="w-full h-32 mb-6 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                 />
-                
                 <div className="mb-6">
                   <label className="block mb-2 text-sm font-medium text-gray-700">
                     <span className="w-4 h-4 mr-2 inline-flex items-center justify-center">
@@ -265,7 +339,6 @@ export default function AnalizadorDatos() {
                       hover:file:bg-gray-200"
                   />
                 </div>
-                
                 <button 
                   type="submit" 
                   disabled={loading}
@@ -291,8 +364,6 @@ export default function AnalizadorDatos() {
                 </button>
               </form>
             </motion.div>
-
-            {/* Mensaje de error */}
             <AnimatePresence>
               {error && (
                 <motion.div
@@ -310,11 +381,8 @@ export default function AnalizadorDatos() {
             </AnimatePresence>
           </div>
         </div>
-
-        {/* Panel derecho - Resultados */}
         <div className="flex-shrink-0 w-full md:w-1/2 lg:w-2/3 h-full overflow-y-auto p-6 bg-gray-50">
           <div className="w-full text-left space-y-6">
-            {/* Botones de navegación entre secciones - Versión más refinada */}
             <div className="flex flex-wrap gap-2 mb-6">
               <button
                 onClick={() => toggleSection('informe')}
@@ -334,7 +402,6 @@ export default function AnalizadorDatos() {
                 </span>
                 Informe Analítico
               </button>
-              
               <button
                 onClick={() => toggleSection('perfil')}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center ${
@@ -353,7 +420,6 @@ export default function AnalizadorDatos() {
                 </span>
                 Perfil de Datos
               </button>
-              
               <button
                 onClick={() => toggleSection('vista-previa')}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center ${
@@ -372,9 +438,25 @@ export default function AnalizadorDatos() {
                 </span>
                 Vista Previa
               </button>
+              <button
+                onClick={() => toggleSection('graficos')}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center ${
+                  activeSection === 'graficos' 
+                    ? 'bg-gray-800 text-white shadow-sm' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-xs'
+                }`}
+              >
+                <span className="w-4 h-4 mr-2 flex items-center justify-center">
+                  <FontAwesomeIcon 
+                    icon={faChartLine} 
+                    className={activeSection === 'graficos' ? 'text-white' : 'text-gray-700'}
+                    width="12" 
+                    height="12"
+                  />
+                </span>
+                Gráficos
+              </button>
             </div>
-
-            {/* Sección de Informe Analítico - Versión más refinada */}
             <motion.div
               className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 overflow-hidden"
             >
@@ -399,8 +481,6 @@ export default function AnalizadorDatos() {
                 </div>
               )}
             </motion.div>
-
-            {/* Sección de Perfil de Datos - Versión más refinada */}
             <motion.div
               className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 overflow-hidden"
             >
@@ -412,8 +492,6 @@ export default function AnalizadorDatos() {
               </h2>
               {activeSection === 'perfil' && renderPerfilDatos(resultado?.perfil)}
             </motion.div>
-
-            {/* Sección de Vista Previa - Versión más refinada */}
             <motion.div
               className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 overflow-hidden"
             >
@@ -437,12 +515,9 @@ export default function AnalizadorDatos() {
                 </div>
               )}
             </motion.div>
-            
-            {data && <Dashborad data={data} />}
+            {activeSection === 'graficos' && data && <Dashboard data={data} />}
           </div>
-         
         </div>
-     
       </div>
     </div>
   );

@@ -29,8 +29,8 @@ export default function Sections() {
         '/ssalaG.png',
     },
     {
-      type: 'technology',
-      title: 'Digital Technology',
+      type: 'Analiza tus bases de datos y encuentra que tan optimizzadas estan',
+      title: 'sube la DB de tu negocio',
       subtitle: 'Helping global businesses',
       link: '/CSVanaliza',
       colSpan: 2,
