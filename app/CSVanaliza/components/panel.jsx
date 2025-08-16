@@ -238,7 +238,7 @@ export default function AnalizadorDatos() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="w-full"
             >
-              <form onSubmit={handleSubmit} className="mb-6 p-6 bg-white rounded-lg shadow-md border border-gray-200">
+              <form onSubmit={handleSubmit} className="mb-6 p-6 text-gray-800 bg-white rounded-lg shadow-md border  border-gray-200">
                 <textarea
                   placeholder="Descripción de la base de datos..."
                   value={descripcion}
@@ -437,6 +437,7 @@ export default function AnalizadorDatos() {
                 </div>
               )}
             </motion.div>
+            
             {data && <Dashborad data={data} />}
           </div>
          
