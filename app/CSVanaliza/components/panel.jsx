@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Dashborad from './Graficas'
 import { 
   faFileUpload, 
   faRocket, 
@@ -27,7 +28,7 @@ export default function AnalizadorDatos() {
   const [resultado, setResultado] = useState(null);
   const [error, setError] = useState(null);
   const [activeSection, setActiveSection] = useState('informe');
-
+  const [data, setData] = useState(null);
   const toggleSection = (section) => {
     setActiveSection(activeSection === section ? null : section);
   };
@@ -91,22 +92,23 @@ export default function AnalizadorDatos() {
           </span>
           Resumen General
         </h3>
-        <table className="w-full border-collapse mb-6">
-          <tbody>
-            <tr className="bg-gray-100">
-              <td className="p-2 border border-gray-200 font-medium">Filas</td>
-              <td className="p-2 border border-gray-200">{perfil.shape[0]}</td>
-            </tr>
-            <tr>
-              <td className="p-2 border border-gray-200 font-medium">Columnas</td>
-              <td className="p-2 border border-gray-200">{perfil.shape[1]}</td>
-            </tr>
-            <tr className="bg-gray-100">
-              <td className="p-2 border border-gray-200 font-medium">Registros duplicados</td>
-              <td className="p-2 border border-gray-200">{perfil.duplicates}</td>
-            </tr>
-          </tbody>
-        </table>
+        <table className="w-full border-collapse mb-6 text-gray-800">
+  <tbody>
+    <tr className="bg-gray-100">
+      <td className="p-2 border border-gray-200 font-medium">Filas</td>
+      <td className="p-2 border border-gray-200">{perfil.shape[0]}</td>
+    </tr>
+    <tr>
+      <td className="p-2 border border-gray-200 font-medium">Columnas</td>
+      <td className="p-2 border border-gray-200">{perfil.shape[1]}</td>
+    </tr>
+    <tr className="bg-gray-100">
+      <td className="p-2 border border-gray-200 font-medium">Registros duplicados</td>
+      <td className="p-2 border border-gray-200">{perfil.duplicates}</td>
+    </tr>
+  </tbody>
+</table>
+
 
         <h3 className="text-base font-medium mb-3 text-gray-800 flex items-center">
           <span className="w-4 h-4 mr-2 flex items-center justify-center">
@@ -114,7 +116,7 @@ export default function AnalizadorDatos() {
           </span>
           Tipos de Datos
         </h3>
-        <table className="w-full border-collapse mb-6">
+        <table className="w-full border-collapse mb-6 text-gray-800">
           <thead>
             <tr className="bg-gray-100">
               <th className="p-2 border border-gray-200">Columna</th>
@@ -137,7 +139,7 @@ export default function AnalizadorDatos() {
           </span>
           Valores Faltantes
         </h3>
-        <table className="w-full border-collapse mb-6">
+        <table className="w-full border-collapse mb-6 text-gray-800">
           <thead>
             <tr className="bg-gray-100">
               <th className="p-2 border border-gray-200">Columna</th>
@@ -154,40 +156,7 @@ export default function AnalizadorDatos() {
           </tbody>
         </table>
 
-        {perfil.numeric_summary && (
-          <>
-            <h3 className="text-base font-medium mb-3 text-gray-800 flex items-center">
-              <span className="w-4 h-4 mr-2 flex items-center justify-center">
-                <FontAwesomeIcon icon={faChartLine} className="text-gray-500" width="12" height="12" />
-              </span>
-              Resumen Numérico
-            </h3>
-            <table className="w-full border-collapse mb-6">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-2 border border-gray-200">Columna</th>
-                  <th className="p-2 border border-gray-200">Mínimo</th>
-                  <th className="p-2 border border-gray-200">Máximo</th>
-                  <th className="p-2 border border-gray-200">Media</th>
-                  <th className="p-2 border border-gray-200">Mediana</th>
-                  <th className="p-2 border border-gray-200">Desviación</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(perfil.numeric_summary || {}).map(([columna, stats], index) => (
-                  <tr key={columna} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="p-2 border border-gray-200">{columna}</td>
-                    <td className="p-2 border border-gray-200">{stats.min?.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-200">{stats.max?.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-200">{stats.mean?.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-200">{stats['50%']?.toFixed(2)}</td>
-                    <td className="p-2 border border-gray-200">{stats.std?.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
+        
 
         {perfil.categorical_tops && (
           <>
@@ -200,7 +169,7 @@ export default function AnalizadorDatos() {
             {Object.entries(perfil.categorical_tops || {}).map(([columna, valores]) => (
               <div key={columna} className="mb-4">
                 <h4 className="text-sm font-medium mb-1 text-gray-700">{columna}</h4>
-                <table className="w-full border-collapse mb-3">
+                <table className="w-full border-collapse mb-3 text-gray-800">
                   <thead>
                     <tr className="bg-gray-100">
                       <th className="p-2 border border-gray-200">Valor</th>
@@ -468,8 +437,11 @@ export default function AnalizadorDatos() {
                 </div>
               )}
             </motion.div>
+            {data && <Dashborad data={data} />}
           </div>
+         
         </div>
+     
       </div>
     </div>
   );
