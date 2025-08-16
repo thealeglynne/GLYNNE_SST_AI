@@ -27,8 +27,18 @@ export default function Page() {
       }
     };
 
+    // Primera activación al cargar
     wakeUpServers();
-  }, []); // ✅ solo un cierre aquí
+
+    // Intervalo de 8 minutos (480000 ms)
+    const interval = setInterval(() => {
+      console.log('⏳ Enviando keep-alive...');
+      wakeUpServers();
+    }, 480000);
+
+    // Limpiar el intervalo si el componente se desmonta
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white p-0 m-0 relative flex flex-col">

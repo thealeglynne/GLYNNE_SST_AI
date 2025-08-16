@@ -41,20 +41,20 @@ export default function BienvenidaUsuario() {
   }
 
   const handleRedirect = () => {
-    window.location.href = 'https://glynne-sst-ai-hsiy.vercel.app/chat';
+    window.location.href = 'https://glynne-sst-ai-hsiy.vercel.app/CSVanaliza';
   };
 
   return (
     <div
       className="w-full max-w-xs mx-auto bg-white shadow-md rounded-2xl p-5 text-center border border-gray-100"
       style={{
-        backgroundImage: "url('https://i.pinimg.com/1200x/4f/fb/52/4ffb521a94295698813c307e13bd463f.jpg')",
+        backgroundImage: "url('https://i.pinimg.com/1200x/cd/9b/01/cd9b015e708f9c5f1b1a3e82a5b6c721.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
     >
       <h2 className="text-lg font-bold text-white text-gray-while">
-        Impulsa tu negocio
+        Quieres saber el estado de tu negocio? 
       </h2>
   
       <p className="text-[11px] text-white mt-1 italic">
@@ -74,7 +74,7 @@ export default function BienvenidaUsuario() {
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent 
                        translate-x-[-100%] hover:translate-x-[100%] transition-transform duration-700 ease-in-out"
           />
-          Generar Auditoría Gratuita
+          Conoce tus bases de datos
         </motion.button>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { FaTrash, FaListUl } from 'react-icons/fa';
 import PreguntasSugeridas from '../components/preguntasPredefinidas';
 import Perfil from '../components/perfil'
 import Stt from './sst'
-
+import CsvAnalizer from '../components/csvAnalicer'
 export default function AuditoriasFullScreen() {
   const [user, setUser] = useState(null);
   const [auditorias, setAuditorias] = useState([]);
@@ -135,6 +135,7 @@ export default function AuditoriasFullScreen() {
 
   <Perfil />
   <Stt />
+  <CsvAnalizer />
 
   {/* Componente de preguntas predefinidas */}
   <PreguntasSugeridas 

@@ -48,7 +48,7 @@ export default function BienvenidaUsuario() {
     <div
       className="w-full max-w-xs mx-auto bg-white shadow-md rounded-2xl p-5 text-center border border-gray-100"
       style={{
-        backgroundImage: "url('https://i.pinimg.com/1200x/4f/fb/52/4ffb521a94295698813c307e13bd463f.jpg')",
+        backgroundImage: "url('https://i.pinimg.com/736x/50/ab/12/50ab1273f48ae11bd7e8c150dfe2ba8c.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}

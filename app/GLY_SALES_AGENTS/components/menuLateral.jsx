@@ -5,7 +5,7 @@ import { FaBars, FaTimes } from 'react-icons/fa'
 import Perfil from '../components/perfil'
 import Recomendaciones from './preguntasPredefinidas'
 import Auditoria from './auditoria'
-
+import CsvAnalizer from '../components/csvAnalicer'
 const SideMenu = () => {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -35,6 +35,7 @@ const SideMenu = () => {
         <div className="h-full p-6 overflow-y-auto text-black flex flex-col gap-6 mt-[20px]">
           <Perfil />
           <Auditoria />
+          <CsvAnalizer />
           <Recomendaciones />
 
           {/* Footer */}

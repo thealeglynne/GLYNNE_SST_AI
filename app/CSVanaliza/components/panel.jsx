@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Chart from 'chart.js/auto';
+import Chat from '../../GLY_SALES_AGENTS/components/auditoria'
+import Combersacion from '../../chat/components/sst'
 import { 
   faFileUpload, 
   faRocket, 
@@ -16,97 +17,9 @@ import {
   faFileExcel,
   faFile,
   faInfoCircle,
-  faChartLine,
   faQuestionCircle,
   faDatabase
 } from '@fortawesome/free-solid-svg-icons';
-
-// Dashboard Component for Chart.js
-const Dashboard = ({ data }) => {
-  const chartRef = useRef(null);
-  const chartInstanceRef = useRef(null);
-
-  useEffect(() => {
-    if (data && Array.isArray(data) && data.length > 0 && chartRef.current) {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-
-      const labels = data.map((row, idx) => `Fila ${idx + 1}`);
-      const keys = Object.keys(data[0]).filter((key) => !isNaN(data[0][key]));
-      const datasets = keys.map((key, index) => ({
-        label: key,
-        data: data.map((row) => Number(row[key])),
-        backgroundColor: `rgba(${75 + index * 50}, ${192 - index * 50}, ${192 - index * 20}, 0.5)`,
-        borderColor: `rgba(${75 + index * 50}, ${192 - index * 50}, ${192 - index * 20}, 1)`,
-        borderWidth: 1,
-      }));
-
-      chartInstanceRef.current = new Chart(chartRef.current, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets,
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-            },
-            title: {
-              display: true,
-              text: 'Análisis de Datos',
-              font: {
-                size: 16,
-              },
-            },
-          },
-        },
-      });
-    }
-
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-        chartInstanceRef.current = null;
-      }
-    };
-  }, [data]);
-
-  return (
-    <motion.div
-      className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 overflow-hidden"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h2 className="text-lg font-medium mb-4 text-gray-800 flex items-center">
-        <span className="w-4 h-4 mr-2 flex items-center justify-center">
-          <FontAwesomeIcon icon={faChartBar} className="text-gray-500" width="12" height="12" />
-        </span>
-        <span className="text-gray-700">Gráficos de Datos</span>
-      </h2>
-      <div className="overflow-x-auto">
-        {data && Array.isArray(data) && data.length > 0 ? (
-          <div style={{ height: '300px' }}>
-            <canvas ref={chartRef}></canvas>
-          </div>
-        ) : (
-          <div className="text-gray-400 italic">
-            No hay datos disponibles para mostrar gráficos.
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-};
 
 export default function AnalizadorDatos() {
   const [descripcion, setDescripcion] = useState('');
@@ -380,6 +293,12 @@ export default function AnalizadorDatos() {
               )}
             </AnimatePresence>
           </div>
+                 <Chat />
+                 <br></br>
+                <Combersacion />
+
+
+
         </div>
         <div className="flex-shrink-0 w-full md:w-1/2 lg:w-2/3 h-full overflow-y-auto p-6 bg-gray-50">
           <div className="w-full text-left space-y-6">
@@ -437,24 +356,6 @@ export default function AnalizadorDatos() {
                   />
                 </span>
                 Vista Previa
-              </button>
-              <button
-                onClick={() => toggleSection('graficos')}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center ${
-                  activeSection === 'graficos' 
-                    ? 'bg-gray-800 text-white shadow-sm' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-xs'
-                }`}
-              >
-                <span className="w-4 h-4 mr-2 flex items-center justify-center">
-                  <FontAwesomeIcon 
-                    icon={faChartLine} 
-                    className={activeSection === 'graficos' ? 'text-white' : 'text-gray-700'}
-                    width="12" 
-                    height="12"
-                  />
-                </span>
-                Gráficos
               </button>
             </div>
             <motion.div
@@ -515,7 +416,6 @@ export default function AnalizadorDatos() {
                 </div>
               )}
             </motion.div>
-            {activeSection === 'graficos' && data && <Dashboard data={data} />}
           </div>
         </div>
       </div>

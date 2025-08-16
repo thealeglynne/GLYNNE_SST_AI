@@ -31,7 +31,7 @@ export default function Sections() {
     {
       type: 'Analiza tus bases de datos y encuentra que tan optimizzadas estan',
       title: 'sube la DB de tu negocio',
-      subtitle: 'Helping global businesses',
+      subtitle: 'Analiza tus bases de datos y encuentra que tan optimizadas estan',
       link: '/CSVanaliza',
       colSpan: 2,
       height: 300,
@@ -66,7 +66,7 @@ export default function Sections() {
 
       {/* Título más pequeño */}
       <h2 className="text-center text-2xl md:text-3xl font-semibold mb-6 max-w-7xl">
-        Bienvenido a los servicios de GLYNNE
+       GLYNNE SERVICES
       </h2>
 
       {/* Logo debajo del título */}
@@ -76,9 +76,9 @@ export default function Sections() {
 
       {/* Texto con gancho, más persuasivo */}
       <p className="max-w-4xl text-center text-gray-800 text-lg mb-12 px-4 leading-relaxed">
-        En la era de la <span className="font-semibold">Inteligencia Artificial</span>, adaptarte o quedarte atrás es la única opción.<br />
-        Descubre cómo podemos asesorarte y potenciar tu negocio con <span className="font-semibold">software inteligente y automatización a la vanguardia</span>.
-      </p>
+  En la era de la <span className="font-semibold">IA</span>, lidera o quédate atrás.<br />
+  Potencia tu negocio con <span className="font-semibold">soluciones inteligentes</span> y acesoramiento  de vanguardia.
+</p>
 
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4 max-w-7xl w-full">
         {cards.map(({ type, title, subtitle, link, colSpan, height, bgImage }, idx) => (

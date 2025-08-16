@@ -46,7 +46,7 @@ export default function BienvenidaUsuario() {
       }}
     >
       {/* Capa con blur y oscurecimiento */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-black/40 " />
 
       {/* Contenido encima del blur */}
       <div className="relative z-10">
