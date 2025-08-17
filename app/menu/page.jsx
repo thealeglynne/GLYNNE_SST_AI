@@ -39,15 +39,24 @@ export default function Page() {
         ]);
       } catch (error) {
         console.error('Error al despertar los servicios:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    // Primera activación al cargar
-    wakeUpServers();
+    const alreadyInitialized = localStorage.getItem("servicesReady");
 
-    // Intervalo de 8 minutos (480000 ms)
+    if (alreadyInitialized) {
+      // Ya se habían levantado una vez → no mostrar loader
+      setLoading(false);
+      wakeUpServers(); // los despierto en background
+    } else {
+      // Primera vez → mostrar loader y luego marcar como listo
+      wakeUpServers().finally(() => {
+        setLoading(false);
+        localStorage.setItem("servicesReady", "true");
+      });
+    }
+
+    // Intervalo de 8 minutos para keep-alive (solo mientras la pestaña esté abierta)
     const interval = setInterval(() => {
       console.log('⏳ Enviando keep-alive...');
       wakeUpServers();
