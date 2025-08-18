@@ -5,65 +5,32 @@ import Menu from '../menu/components/menu';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
-// Función fetch con timeout
-async function fetchWithTimeout(resource, options = {}) {
-  const { timeout = 20000 } = options; // 20 segundos por defecto
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    const response = await fetch(resource, {
-      ...options,
-      signal: controller.signal,
-    });
-    return response;
-  } finally {
-    clearTimeout(id);
-  }
-}
-
 export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const wakeUpServers = async () => {
       try {
-        await Promise.allSettled([
-          fetchWithTimeout('https://gly-ai-brain.onrender.com', { method: 'GET', timeout: 15000 }),
-          fetchWithTimeout('https://gly-tts-back.onrender.com/conversar', {
+        await Promise.all([
+          fetch('https://gly-ai-brain.onrender.com', { method: 'GET' }),
+          fetch('https://gly-tts-back.onrender.com/conversar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ texto: 'ping' }),
-            timeout: 15000,
+            body: JSON.stringify({ texto: 'ping' })
           }),
-          fetchWithTimeout('https://gly-csv-service-3.onrender.com', { method: 'GET', timeout: 15000 }),
+          fetch('https://gly-csv-service-3.onrender.com', { method: 'GET' }) // nueva llamada
         ]);
       } catch (error) {
         console.error('Error al despertar los servicios:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const alreadyInitialized = localStorage.getItem("servicesReady");
+    // Primera activación al cargar
+    wakeUpServers();
 
-    if (alreadyInitialized) {
-      // Ya se habían levantado una vez → no mostrar loader
-      setLoading(false);
-      wakeUpServers(); // los despierto en background
-    } else {
-      // Primera vez → mostrar loader y luego marcar como listo
-      wakeUpServers().finally(() => {
-        setLoading(false);
-        localStorage.setItem("servicesReady", "true");
-      });
-    }
-
-    // Intervalo de 8 minutos para keep-alive (solo mientras la pestaña esté abierta)
-    const interval = setInterval(() => {
-      console.log('⏳ Enviando keep-alive...');
-      wakeUpServers();
-    }, 480000);
-
-    return () => clearInterval(interval);
-  }, []);
+ 
 
   return (
     <div className="min-h-screen bg-white p-0 m-0 relative flex flex-col">
@@ -87,7 +54,10 @@ export default function Page() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="font-bold text-center text-black"
-                style={{ fontSize: 'clamp(1.4rem, 2.5vw, 2.3rem)', lineHeight: '1.3' }}
+                style={{
+                  fontSize: 'clamp(1.4rem, 2.5vw, 2.3rem)',
+                  lineHeight: '1.3',
+                }}
               >
                 Iniciando servicios
               </motion.h2>
@@ -100,7 +70,13 @@ export default function Page() {
                 className="mt-2"
               />
 
-              <p className="text-center text-gray-600 max-w-[70ch] mt-4" style={{ fontSize: 'clamp(0.75rem, 1.2vw, 1rem)', lineHeight: '1.6' }}>
+              <p
+                className="text-center text-gray-600 max-w-[70ch] mt-4"
+                style={{
+                  fontSize: 'clamp(0.75rem, 1.2vw, 1rem)',
+                  lineHeight: '1.6',
+                }}
+              >
                 Estamos preparando los sistemas para que la experiencia sea rápida y estable.
                 Este paso inicial conecta con nuestros servicios de <strong>inteligencia artificial</strong> 
                 y procesamiento de voz antes de comenzar.
