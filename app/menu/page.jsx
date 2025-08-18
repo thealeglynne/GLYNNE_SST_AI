@@ -30,7 +30,8 @@ export default function Page() {
     // Primera activación al cargar
     wakeUpServers();
 
- 
+   
+  }, []);
 
   return (
     <div className="min-h-screen bg-white p-0 m-0 relative flex flex-col">
