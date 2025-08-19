@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import MenuLateral from '../components/menuLateral'
 import Aalert from '../components/alertSalirChaarla'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 
 const VoiceChatFlame = () => {
   const canvasRef = useRef(null)
@@ -16,6 +18,7 @@ const VoiceChatFlame = () => {
   const [activo, setActivo] = useState(false)
   const [iconVisible, setIconVisible] = useState(true)
   const [menuAbierto, setMenuAbierto] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
 
   const { transcript, listening, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition()
 
@@ -194,6 +197,19 @@ const VoiceChatFlame = () => {
     SpeechRecognition.startListening({ continuous: false, language: 'es-CO' })
   }
 
+  // 🆕 Detectar dispositivos móviles
+  useEffect(() => {
+    const checkDevice = () => {
+      const isMobile = window.innerWidth <= 600
+      setShowPopup(isMobile)
+    }
+
+    checkDevice()
+    window.addEventListener('resize', checkDevice)
+
+    return () => window.removeEventListener('resize', checkDevice)
+  }, [])
+
   return (
     <div
       className={`w-screen h-screen flex flex-row bg-white text-black transition-all duration-300 ${
@@ -237,6 +253,59 @@ const VoiceChatFlame = () => {
           </div>
         )}
       </div>
+
+      {/* 🆕 Popup para dispositivos móviles */}
+      <AnimatePresence>
+        {showPopup && (
+          <motion.div
+            className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="bg-white rounded-3xl shadow-2xl w-[80vw] max-w-4xl px-[4vw] py-[5vh] text-gray-800"
+              initial={{ scale: 0.95, y: 30 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 40 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            >
+              <div className="w-full flex flex-col items-center justify-center gap-[2vh]">
+                <motion.h2
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="font-bold text-center text-black"
+                  style={{
+                    fontSize: 'clamp(1.4rem, 2.5vw, 2.3rem)',
+                    lineHeight: '1.3',
+                  }}
+                >
+                  <span className="text-black">Oye!! Espera.</span>
+                </motion.h2>
+
+                <Image
+                  src="/logo2.png"
+                  alt="Logo GLY-IA"
+                  width={70}
+                  height={70}
+                  className="mt-[-8px]"
+                />
+
+                <p
+                  className="text-center text-gray-600 max-w-[70ch]"
+                  style={{
+                    fontSize: 'clamp(0.75rem, 1.2vw, 1rem)',
+                    lineHeight: '1.6',
+                  }}
+                >
+                  Este servicio solo está disponible en Google Chrome. Por favor, Espera nuestra app movil pronto  <strong>GLYNNE</strong>.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style jsx>{`
         @keyframes slide {
