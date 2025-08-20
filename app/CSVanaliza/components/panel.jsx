@@ -224,7 +224,7 @@ export default function AnalizadorDatos() {
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-sm sm:text-base text-gray-600 max-w-md"
+              className="text-sm sm:text-base text-gray-800 max-w-md"
             >
               Sube tus bases de datos y nuestro sistema de inteligencia artificial los procesará
               para ofrecerte un análisis rápido, preciso y fácil de entender.
