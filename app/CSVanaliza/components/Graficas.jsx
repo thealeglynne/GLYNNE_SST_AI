@@ -92,9 +92,9 @@ export default function AnalizadorDatos() {
           </span>
           Resumen General
         </h3>
-        <table className="w-full border-collapse mb-6 text-gray-800">
+        <table className="w-full border-collapse mb-6 text-white">
           <tbody>
-            <tr className="bg-gray-100">
+            <tr className="bg-white">
               <td className="p-2 border border-gray-200 font-medium">Filas</td>
               <td className="p-2 border border-gray-200">{perfil.shape[0]}</td>
             </tr>
