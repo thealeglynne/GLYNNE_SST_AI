@@ -58,7 +58,7 @@ export default function AnalizadorDatos() {
       formData.append('file', file);
 
       const res = await fetch('https://gly-csv-service-3.onrender.com/analizar', {
-        method: 'POST',
+        method: 'POST',   
         body: formData,
       });
 
